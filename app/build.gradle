@@ -86,10 +86,15 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.aar"])
+    implementation fileTree(dir: "libs", include: ["*.aar"], exclude: [
+        "tvbus-release.aar",     // SECURITY: P2P with remote .so download
+        "jianpian-release.aar",  // SECURITY: P2P library (3.7MB native code)
+        "thunder-release.aar",   // SECURITY: Xunlei P2P (3.6MB native code)
+        "forcetech-release.aar"  // SECURITY: P2P library
+    ])
     implementation project(':catvod')
-    implementation project(':chaquo')
-    implementation project(':quickjs')
+    // implementation project(':chaquo') // SECURITY: Disabled
+    // implementation project(':quickjs') // SECURITY: Disabled
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.core:core-splashscreen:1.0.1'
     implementation 'androidx.media:media:1.7.1'

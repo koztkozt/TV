@@ -26,16 +26,8 @@ public class JsLoader {
     }
 
     public Spider getSpider(String key, String api, String ext, String jar) {
-        try {
-            if (spiders.containsKey(key)) return spiders.get(key);
-            Spider spider = new com.fongmi.quickjs.crawler.Spider(key, api, BaseLoader.get().dex(jar));
-            spider.init(App.get(), ext);
-            spiders.put(key, spider);
-            return spider;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return new SpiderNull();
-        }
+        // SECURITY: JavaScript execution disabled
+        return new SpiderNull();
     }
 
     public Object[] proxyInvoke(Map<String, String> params) {

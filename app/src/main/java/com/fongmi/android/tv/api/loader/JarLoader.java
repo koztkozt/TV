@@ -86,67 +86,42 @@ public class JarLoader {
     }
 
     public synchronized void parseJar(String key, String jar) {
-        if (loaders.containsKey(key)) return;
-        String[] texts = jar.split(";md5;");
-        String md5 = texts.length > 1 ? texts[1].trim() : "";
-        if (md5.startsWith("http")) md5 = OkHttp.string(md5).trim();
-        jar = texts[0];
-        if (!md5.isEmpty() && Util.equals(jar, md5)) {
-            load(key, Path.jar(jar));
-        } else if (jar.startsWith("http")) {
-            load(key, download(jar));
-        } else if (jar.startsWith("file")) {
-            load(key, Path.local(jar));
-        } else if (jar.startsWith("assets")) {
-            parseJar(key, UrlUtil.convert(jar));
-        }
+        // SECURITY: Block ALL JAR parsing to prevent dangerous dynamic code execution
+        // This completely prevents JAR file downloads and loading for maximum security
+        return; // Skip ALL JAR loading operations
     }
 
     public DexClassLoader dex(String jar) {
-        try {
-            String jaKey = Util.md5(jar);
-            if (!loaders.containsKey(jaKey)) parseJar(jaKey, jar);
-            return loaders.get(jaKey);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return null;
-        }
+        // SECURITY: Block ALL DexClassLoader creation to prevent dangerous dynamic code execution
+        // This completely prevents JAR-based class loading for maximum security
+        return null; // Always return null to prevent dynamic class loading
     }
 
     public Spider getSpider(String key, String api, String ext, String jar) {
-        String jaKey = Util.md5(jar);
-        String spKey = jaKey + key;
-        String crash = "crash_" + spKey;
-        if (Prefers.getBoolean(crash)) return new SpiderNull();
-        if (spiders.containsKey(spKey)) return spiders.get(spKey);
-        try {
-            Prefers.put(crash, true);
-            if (!loaders.containsKey(jaKey)) parseJar(jaKey, jar);
-            Spider spider = (Spider) loaders.get(jaKey).loadClass("com.github.catvod.spider." + api.split("csp_")[1]).newInstance();
-            spider.init(App.get(), ext);
-            spiders.put(spKey, spider);
-            Prefers.put(crash, false);
-            return spider;
-        } catch (Throwable e) {
-            Prefers.put(crash, false);
-            e.printStackTrace();
-            return new SpiderNull();
-        }
+        // SECURITY: Block ALL JAR spider loading to prevent dangerous dynamic code execution
+        // This completely prevents JAR-based spider execution for maximum security
+        return new SpiderNull(); // Always return null spider to trigger direct URL fetch
     }
 
     public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Throwable {
+        // SECURITY: Return null if loaders are empty (JAR loading disabled)
+        if (recent == null || loaders.get(recent) == null) return null;
         Class<?> clz = loaders.get(recent).loadClass("com.github.catvod.parser.Json" + key);
         Method method = clz.getMethod("parse", LinkedHashMap.class, String.class);
         return (JSONObject) method.invoke(null, jxs, url);
     }
 
     public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Throwable {
+        // SECURITY: Return null if loaders are empty (JAR loading disabled)
+        if (recent == null || loaders.get(recent) == null) return null;
         Class<?> clz = loaders.get(recent).loadClass("com.github.catvod.parser.Mix" + key);
         Method method = clz.getMethod("parse", LinkedHashMap.class, String.class, String.class, String.class);
         return (JSONObject) method.invoke(null, jxs, name, flag, url);
     }
 
     public Object[] proxyInvoke(Map<String, String> params) {
+        // SECURITY: Return null if methods are empty (JAR loading disabled)
+        if (recent == null || methods.isEmpty()) return null;
         Object[] result = proxyInvoke(methods.get(recent), params);
         return result != null ? result : tryOthers(params);
     }

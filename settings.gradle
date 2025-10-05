@@ -20,6 +20,6 @@ dependencyResolutionManagement {
 }
 include ':app'
 include ':catvod'
-include ':chaquo'
-include ':quickjs'
+// include ':chaquo' // SECURITY: Disabled
+// include ':quickjs' // SECURITY: Disabled
 rootProject.name = "TV"
