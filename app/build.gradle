@@ -44,6 +44,17 @@ android {
         viewBinding true
     }
 
+    sourceSets {
+        main {
+            java {
+                exclude '**/TVBus.java'
+                exclude '**/Force.java'
+                exclude '**/JianPian.java'
+                exclude '**/Thunder.java'
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
