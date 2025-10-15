@@ -51,7 +51,7 @@ public class BaseLoader {
         
         // SECURITY: Block ALL JAR loading (csp_ prefix) to prevent dangerous dynamic code execution
         if (csp) {
-            return new SpiderNull(); // Return null spider to trigger direct URL fetch
+            return jarLoader.getSpider(key, api, ext, jar);
         }
         
         if (py) return new SpiderNull(); // Python disabled
@@ -73,36 +73,34 @@ public class BaseLoader {
         boolean py = api.contains(".py");
         boolean csp = api.startsWith("csp_");
         
-        // SECURITY: Skip ALL JAR operations (csp_ prefix) to prevent dangerous operations
-        if (csp) return;
-        
-        if (js && jsLoader != null) jsLoader.setRecent(key);
-        if (py && pyLoader != null) pyLoader.setRecent(key);
-        else if (csp) jarLoader.setRecent(Util.md5(jar));
+        if (csp) jarLoader.setRecent(Util.md5(jar));
     }
 
     public Object[] proxyLocal(Map<String, String> params) {
-        // SECURITY: Disabled proxy invocation to prevent code execution
-        return new Object[]{};
+        if ("js".equals(params.get("do"))) {
+            return jsLoader.proxyInvoke(params);
+        } else if ("py".equals(params.get("do"))) {
+            return pyLoader.proxyInvoke(params);
+        } else {
+            return jarLoader.proxyInvoke(params);
+        }
     }
 
     public void parseJar(String jar, boolean recent) {
-        // SECURITY: Disabled JAR loading to prevent dynamic code execution
-        return;
+        if (TextUtils.isEmpty(jar)) return;
+        jarLoader.parseJar(Util.md5(jar), jar);
+        if (recent) jarLoader.setRecent(Util.md5(jar));
     }
 
     public DexClassLoader dex(String jar) {
-        // SECURITY: Disabled dex loading to prevent dynamic code execution
-        return null;
+        return jarLoader.dex(jar);
     }
 
     public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Throwable {
-        // SECURITY: Disabled JSON extension to prevent code execution
-        return new JSONObject();
+        return jarLoader.jsonExt(key, jxs, url);
     }
 
     public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Throwable {
-        // SECURITY: Disabled JSON extension to prevent code execution
-        return new JSONObject();
+        return jarLoader.jsonExtMix(flag, key, name, jxs, url);
     }
 }
