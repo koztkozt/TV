@@ -105,7 +105,7 @@ dependencies {
     ])
     implementation project(':catvod')
     // implementation project(':chaquo') // SECURITY: Disabled
-    // implementation project(':quickjs')
+    implementation project(':quickjs')
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.core:core-splashscreen:1.0.1'
     implementation 'androidx.media:media:1.7.1'
