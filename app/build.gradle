@@ -104,7 +104,7 @@ dependencies {
         "forcetech-release.aar"  // SECURITY: P2P library
     ])
     implementation project(':catvod')
-    // implementation project(':chaquo') // SECURITY: Disabled
+    implementation project(':chaquo')
     implementation project(':quickjs')
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.core:core-splashscreen:1.0.1'

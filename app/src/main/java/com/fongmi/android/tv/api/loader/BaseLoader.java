@@ -34,7 +34,7 @@ public class BaseLoader {
 
     private BaseLoader() {
         this.jarLoader = new JarLoader();
-        this.pyLoader = null;
+        this.pyLoader = new PyLoader();
         this.jsLoader = new JsLoader();
     }
 
@@ -48,8 +48,8 @@ public class BaseLoader {
         boolean js = api.contains(".js");
         boolean py = api.contains(".py");
         boolean csp = api.startsWith("csp_");
-        // if (py) return pyLoader.getSpider(key, api, ext);
-        if (js) return jsLoader.getSpider(key, api, ext, jar);
+        if (py) return pyLoader.getSpider(key, api, ext);
+        else if (js) return jsLoader.getSpider(key, api, ext, jar);
         else if (csp) return jarLoader.getSpider(key, api, ext, jar);
         else return new SpiderNull();
     }
@@ -68,15 +68,15 @@ public class BaseLoader {
         boolean py = api.contains(".py");
         boolean csp = api.startsWith("csp_");
         if (js) jsLoader.setRecent(key);
-        // else if (py) pyLoader.setRecent(key);
+        else if (py) pyLoader.setRecent(key);
         else if (csp) jarLoader.setRecent(Util.md5(jar));
     }
 
     public Object[] proxyLocal(Map<String, String> params) {
         if ("js".equals(params.get("do"))) {
             return jsLoader.proxyInvoke(params);
-        // } else if ("py".equals(params.get("do"))) {
-        //     return pyLoader.proxyInvoke(params);
+        } else if ("py".equals(params.get("do"))) {
+            return pyLoader.proxyInvoke(params);
         } else {
             return jarLoader.proxyInvoke(params);
         }
