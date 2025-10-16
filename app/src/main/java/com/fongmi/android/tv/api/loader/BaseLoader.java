@@ -35,7 +35,7 @@ public class BaseLoader {
     private BaseLoader() {
         this.jarLoader = new JarLoader();
         this.pyLoader = null; // SECURITY: Disabled
-        this.jsLoader = null; // SECURITY: Disabled
+        this.jsLoader = new JsLoader(); // Re-enabled for DRM processing
     }
 
     public void clear() {
@@ -49,13 +49,9 @@ public class BaseLoader {
         boolean py = api.contains(".py");
         boolean csp = api.startsWith("csp_");
         
-        // SECURITY: Block ALL JAR loading (csp_ prefix) to prevent dangerous dynamic code execution
-        if (csp) {
-            return jarLoader.getSpider(key, api, ext, jar);
-        }
-        
+        if (csp) return jarLoader.getSpider(key, api, ext, jar);
+        if (js) return jsLoader.getSpider(key, api, ext, jar); // Re-enabled for DRM
         if (py) return new SpiderNull(); // Python disabled
-        if (js) return new SpiderNull(); // JavaScript disabled
         else return new SpiderNull();
     }
 
@@ -74,13 +70,14 @@ public class BaseLoader {
         boolean csp = api.startsWith("csp_");
         
         if (csp) jarLoader.setRecent(Util.md5(jar));
+        if (js) jsLoader.setRecent(key); // Re-enabled for DRM
     }
 
     public Object[] proxyLocal(Map<String, String> params) {
         if ("js".equals(params.get("do"))) {
             return jsLoader.proxyInvoke(params);
         } else if ("py".equals(params.get("do"))) {
-            return pyLoader.proxyInvoke(params);
+            return pyLoader != null ? pyLoader.proxyInvoke(params) : null;
         } else {
             return jarLoader.proxyInvoke(params);
         }
