@@ -44,17 +44,6 @@ android {
         viewBinding true
     }
 
-    sourceSets {
-        main {
-            java {
-                exclude '**/TVBus.java'
-                exclude '**/Force.java'
-                exclude '**/JianPian.java'
-                exclude '**/Thunder.java'
-            }
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled true
@@ -97,12 +86,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.aar"], exclude: [
-        "tvbus-release.aar",     // SECURITY: P2P with remote .so download
-        "jianpian-release.aar",  // SECURITY: P2P library (3.7MB native code)
-        "thunder-release.aar",   // SECURITY: Xunlei P2P (3.6MB native code)
-        "forcetech-release.aar"  // SECURITY: P2P library
-    ])
+    implementation fileTree(dir: "libs", include: ["*.aar"])
     implementation project(':catvod')
     implementation project(':chaquo')
     implementation project(':quickjs')

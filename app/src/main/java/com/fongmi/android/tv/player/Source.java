@@ -5,12 +5,11 @@ import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.Result;
-// SECURITY: P2P extractors disabled
-// import com.fongmi.android.tv.player.extractor.Force;
-// import com.fongmi.android.tv.player.extractor.JianPian;
+import com.fongmi.android.tv.player.extractor.Force;
+import com.fongmi.android.tv.player.extractor.JianPian;
 import com.fongmi.android.tv.player.extractor.Push;
-// import com.fongmi.android.tv.player.extractor.TVBus;
-// import com.fongmi.android.tv.player.extractor.Thunder;
+import com.fongmi.android.tv.player.extractor.TVBus;
+import com.fongmi.android.tv.player.extractor.Thunder;
 import com.fongmi.android.tv.player.extractor.Video;
 import com.fongmi.android.tv.player.extractor.Youtube;
 import com.fongmi.android.tv.utils.UrlUtil;
@@ -38,12 +37,11 @@ public class Source {
 
     public Source() {
         extractors = new ArrayList<>();
-        // SECURITY: P2P extractors disabled
-        // extractors.add(new Force());
-        // extractors.add(new JianPian());
+        extractors.add(new Force());
+        extractors.add(new JianPian());
         extractors.add(new Push());
-        // extractors.add(new Thunder());
-        // extractors.add(new TVBus());
+        extractors.add(new Thunder());
+        extractors.add(new TVBus());
         extractors.add(new Video());
         extractors.add(new Youtube());
     }
@@ -57,12 +55,10 @@ public class Source {
 
     private void addCallable(Iterator<Episode> iterator, List<Callable<List<Episode>>> items) {
         String url = iterator.next().getUrl();
-        // SECURITY: Thunder P2P parser disabled
-        // if (Thunder.Parser.match(url)) {
-        //     items.add(Thunder.Parser.get(url));
-        //     iterator.remove();
-        // } else
-        if (Youtube.Parser.match(url)) {
+        if (Thunder.Parser.match(url)) {
+            items.add(Thunder.Parser.get(url));
+            iterator.remove();
+        } else if (Youtube.Parser.match(url)) {
             items.add(Youtube.Parser.get(url));
             iterator.remove();
         }
