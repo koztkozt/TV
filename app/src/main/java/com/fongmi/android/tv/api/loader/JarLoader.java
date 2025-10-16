@@ -86,7 +86,6 @@ public class JarLoader {
     }
 
     public synchronized void parseJar(String key, String jar) {
-        
         if (loaders.containsKey(key)) return;
         String[] texts = jar.split(";md5;");
         String md5 = texts.length > 1 ? texts[1].trim() : "";

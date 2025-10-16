@@ -34,24 +34,23 @@ public class BaseLoader {
 
     private BaseLoader() {
         this.jarLoader = new JarLoader();
-        this.pyLoader = null; // SECURITY: Disabled
-        this.jsLoader = new JsLoader(); // Re-enabled for DRM processing
+        this.pyLoader = null;
+        this.jsLoader = new JsLoader();
     }
 
     public void clear() {
         this.jarLoader.clear();
-        if (this.pyLoader != null) this.pyLoader.clear();
-        if (this.jsLoader != null) this.jsLoader.clear();
+        this.pyLoader.clear();
+        this.jsLoader.clear();
     }
 
     public Spider getSpider(String key, String api, String ext, String jar) {
         boolean js = api.contains(".js");
         boolean py = api.contains(".py");
         boolean csp = api.startsWith("csp_");
-        
-        if (csp) return jarLoader.getSpider(key, api, ext, jar);
-        if (js) return jsLoader.getSpider(key, api, ext, jar); // Re-enabled for DRM
-        if (py) return new SpiderNull(); // Python disabled
+        // if (py) return pyLoader.getSpider(key, api, ext);
+        if (js) return jsLoader.getSpider(key, api, ext, jar);
+        else if (csp) return jarLoader.getSpider(key, api, ext, jar);
         else return new SpiderNull();
     }
 
@@ -68,16 +67,16 @@ public class BaseLoader {
         boolean js = api.contains(".js");
         boolean py = api.contains(".py");
         boolean csp = api.startsWith("csp_");
-        
-        if (csp) jarLoader.setRecent(Util.md5(jar));
-        if (js) jsLoader.setRecent(key); // Re-enabled for DRM
+        if (js) jsLoader.setRecent(key);
+        // else if (py) pyLoader.setRecent(key);
+        else if (csp) jarLoader.setRecent(Util.md5(jar));
     }
 
     public Object[] proxyLocal(Map<String, String> params) {
         if ("js".equals(params.get("do"))) {
             return jsLoader.proxyInvoke(params);
-        } else if ("py".equals(params.get("do"))) {
-            return pyLoader != null ? pyLoader.proxyInvoke(params) : null;
+        // } else if ("py".equals(params.get("do"))) {
+        //     return pyLoader.proxyInvoke(params);
         } else {
             return jarLoader.proxyInvoke(params);
         }
