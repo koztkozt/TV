@@ -92,25 +92,3 @@
 
 # Zxing
 -keep class com.google.zxing.** { *; }
-
-# nextlib-media3ext (DRM Support)
--keep class io.github.anilbeesetti.nextlib.media3ext.** { *; }
--keep class io.github.anilbeesetti.nextlib.media3ext.ffdecoder.** { *; }
--keep class io.github.anilbeesetti.nextlib.media3ext.ffdecoder.Ffmpeg** { *; }
-
-# Media3 DRM Support
--keep class androidx.media3.exoplayer.drm.** { *; }
--keep class androidx.media3.common.drm.** { *; }
--keep class androidx.media3.decoder.** { *; }
-
-# ClearKey DRM (already covered by your existing rule)
-# -keep class com.fongmi.android.tv.bean.** { *; } (already exists)
-
-# FFmpeg Native Methods
--keepclasseswithmembernames class * {
-    native <methods>;
-}
-
-# Keep DRM session managers
--keep class * extends androidx.media3.exoplayer.drm.DrmSessionManager { *; }
--keep class * extends androidx.media3.exoplayer.drm.DrmSession { *; }

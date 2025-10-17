@@ -11,8 +11,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 24
         targetSdk 36
-        versionCode 449
-        versionName "4.4.9"
+        versionCode 452
+        versionName "4.5.2"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString(), "eventBusIndex": "com.fongmi.android.tv.event.EventIndex"]
@@ -71,8 +71,6 @@ android {
     configurations.configureEach {
         resolutionStrategy {
             force 'com.squareup.okhttp3:okhttp:' + okhttpVersion
-            // Force full FFmpeg implementation instead of stub
-            force 'io.github.anilbeesetti:nextlib-media3ext:1.8.0-0.9.0'
         }
     }
 
@@ -95,21 +93,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.core:core-splashscreen:1.0.1'
     implementation 'androidx.media:media:1.7.1'
-    implementation 'androidx.media3:media3-common:' + media3Version
-    implementation 'androidx.media3:media3-container:' + media3Version
-    implementation 'androidx.media3:media3-database:' + media3Version
-    implementation 'androidx.media3:media3-datasource:' + media3Version
-    implementation 'androidx.media3:media3-datasource-okhttp:' + media3Version
-    implementation 'androidx.media3:media3-datasource-rtmp:' + media3Version
-    implementation 'androidx.media3:media3-decoder:' + media3Version
-    implementation 'androidx.media3:media3-effect:' + media3Version
-    implementation 'androidx.media3:media3-exoplayer:' + media3Version
-    implementation 'androidx.media3:media3-exoplayer-dash:' + media3Version
-    implementation 'androidx.media3:media3-exoplayer-hls:' + media3Version
-    implementation 'androidx.media3:media3-exoplayer-rtsp:' + media3Version
-    implementation 'androidx.media3:media3-exoplayer-smoothstreaming:' + media3Version
-    implementation 'androidx.media3:media3-extractor:' + media3Version
-    implementation 'androidx.media3:media3-ui:' + media3Version
+    implementation 'androidx.palette:palette:1.0.0'
     implementation 'androidx.room:room-runtime:2.8.2'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.airbnb.android:lottie:6.6.10'
@@ -126,7 +110,6 @@ dependencies {
     implementation 'com.guolindev.permissionx:permissionx:1.8.1'
     implementation 'com.hierynomus:smbj:0.14.0'
     implementation 'io.antmedia:rtmp-client:3.2.0'
-    implementation 'io.github.anilbeesetti:nextlib-media3ext:1.8.0-0.9.0'
     implementation 'javax.servlet:javax.servlet-api:3.1.0'
     implementation 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
     implementation('org.eclipse.jetty:jetty-server:8.1.21.v20160908') { exclude group: 'org.eclipse.jetty.orbit', module: 'javax.servlet' }
