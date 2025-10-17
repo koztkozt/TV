@@ -35,7 +35,7 @@ jobs:
       - name: Build With Gradle
         run: |
           chmod +x gradlew
-          ./gradlew clean assembleRelease --parallel --daemon --warning-mode all --stacktrace
+          ./gradlew clean assembleArmeabi_v7a --parallel --daemon --warning-mode all --stacktrace
 
       - name: Prepare App
         run: |

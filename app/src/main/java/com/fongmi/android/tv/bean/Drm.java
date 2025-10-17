@@ -51,12 +51,6 @@ public class Drm {
         if (getType().contains("playready")) return C.PLAYREADY_UUID;
         if (getType().contains("widevine")) return C.WIDEVINE_UUID;
         if (getType().contains("clearkey")) return C.CLEARKEY_UUID;
-        
-        // Auto-detect ClearKey if license key is JSON format
-        if (!getKey().startsWith("http") && getKey().contains("\"keys\"") && getKey().contains("\"kty\"")) {
-            return C.CLEARKEY_UUID;
-        }
-        
         return C.UUID_NIL;
     }
 
@@ -65,11 +59,7 @@ public class Drm {
         builder.setMultiSession(!C.CLEARKEY_UUID.equals(getUUID()));
         builder.setLicenseRequestHeaders(Json.toMap(getHeader()));
         builder.setForceDefaultLicenseUri(isForceKey());
-        
-        // For ClearKey DRM, use the original JSON key directly
-        // AndroidX Media3 should handle ClearKey JSON keys properly
         builder.setLicenseUri(getKey());
-        
         return builder.build();
     }
 }
