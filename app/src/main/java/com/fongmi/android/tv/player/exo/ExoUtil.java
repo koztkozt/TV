@@ -35,7 +35,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import androidx.media3.exoplayer.DefaultRenderersFactory;
-import io.github.anilbeesetti.nextlib.media3ext.ffdecoder.NextRenderersFactory;
 
 public class ExoUtil {
 
