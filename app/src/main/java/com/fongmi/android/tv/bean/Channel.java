@@ -344,13 +344,7 @@ public class Channel {
     }
 
     public void setLine(String line) {
-        for (int i = 0; i < getUrls().size(); i++) {
-            String url = getUrls().get(i);
-            if (url.equals(line) || (url.contains("$") && line.equals(url.split("\\$")[0]))) {
-                setLine(i);
-                break;
-            }
-        }
+        setLine(getUrls().indexOf(line));
     }
 
     public Map<String, String> getHeaders() {

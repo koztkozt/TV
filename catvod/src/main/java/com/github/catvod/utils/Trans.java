@@ -1,5 +1,7 @@
 package com.github.catvod.utils;
 
+import android.text.TextUtils;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -35,10 +37,13 @@ public class Trans {
     }
 
     private String get(String text, Map<Character, Character> map) {
-        if (text == null || text.isEmpty()) return text;
-        StringBuilder sb = new StringBuilder(text.length());
-        for (char c : text.toCharArray()) sb.append(map.getOrDefault(c, c));
-        return sb.toString();
+        if (TextUtils.isEmpty(text)) return text;
+        char[] chars = text.toCharArray();
+        for (int i = 0; i < chars.length; ++i) {
+            Character found = map.get(chars[i]);
+            if (found != null) chars[i] = found;
+        }
+        return String.valueOf(chars);
     }
 
     public static boolean pass() {

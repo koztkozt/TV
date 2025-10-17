@@ -251,7 +251,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public boolean onLongClick(Vod item) {
-        if (item.isAction() || item.isFolder()) return false;
         CollectActivity.start(requireActivity(), item.getVodName());
         return true;
     }

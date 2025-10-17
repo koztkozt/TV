@@ -536,7 +536,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDown.Listener
     }
 
     private void setArtwork() {
-        ImgUtil.load(this, mChannel.getLogo(), new CustomTarget<>(ResUtil.getScreenWidth(), ResUtil.getScreenHeight()) {
+        ImgUtil.load(this, mChannel.getUrl(), new CustomTarget<>(ResUtil.getScreenWidth(), ResUtil.getScreenHeight()) {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                 mBinding.exo.setDefaultArtwork(resource);
@@ -616,7 +616,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDown.Listener
     private void setInfo() {
         mViewModel.getEpg(mChannel);
         mBinding.widget.play.setText("");
-        mBinding.widget.name.setMaxEms(48);
         mChannel.loadLogo(mBinding.widget.logo);
         mBinding.control.title.setSelected(true);
         mBinding.widget.name.setText(mChannel.getName());
