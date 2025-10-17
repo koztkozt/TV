@@ -11,17 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 16
-
       - uses: actions/checkout@v4
 
       - name: Set up JDK and Gradle
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Release Apk Sign
         run: |
@@ -44,7 +40,7 @@ jobs:
       - name: Prepare App
         run: |
           mkdir -p ${{ github.workspace }}/apk/
-          find . -name "*.apk" -exec mv {} ${{ github.workspace }}/apk/ \;
+          find . -name "release/*.apk" -exec mv {} ${{ github.workspace }}/apk/ \;
 
       - name: Upload App To Artifact
         uses: actions/upload-artifact@v4
