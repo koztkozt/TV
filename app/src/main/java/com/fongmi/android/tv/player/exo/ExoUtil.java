@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import androidx.media3.exoplayer.DefaultRenderersFactory;
+import io.github.anilbeesetti.nextlib.media3ext.ffdecoder.NextRenderersFactory;
 
 public class ExoUtil {
 
@@ -58,11 +58,7 @@ public class ExoUtil {
     }
 
     public static RenderersFactory buildRenderersFactory(int renderMode) {
-        // Use native AndroidX Media3 renderers for proper DRM support
-        // FFmpeg-based NextRenderersFactory doesn't handle DRM properly
-        return new DefaultRenderersFactory(App.get())
-                .setEnableDecoderFallback(true)
-                .setExtensionRendererMode(renderMode);
+        return new NextRenderersFactory(App.get()).setAudioPrefer(Setting.isAudioPrefer()).setVideoPrefer(Setting.isVideoPrefer()).setEnableDecoderFallback(true).setExtensionRendererMode(renderMode);
     }
 
     public static MediaSource.Factory buildMediaSourceFactory() {
@@ -87,6 +83,7 @@ public class ExoUtil {
         exo.getSubtitleView().setStyle(getCaptionStyle());
         exo.getSubtitleView().setApplyEmbeddedFontSizes(false);
         exo.getSubtitleView().setApplyEmbeddedStyles(!Setting.isCaption());
+        if (Setting.getSubtitlePosition() != 0) exo.getSubtitleView().setBottomPosition(Setting.getSubtitlePosition());
         if (Setting.getSubtitleTextSize() != 0) exo.getSubtitleView().setFractionalTextSize(Setting.getSubtitleTextSize());
     }
 
@@ -99,6 +96,7 @@ public class ExoUtil {
     }
 
     public static String getMimeType(int errorCode) {
+        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) return MimeTypes.APPLICATION_OCTET;
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) return MimeTypes.APPLICATION_M3U8;
         return null;
     }
@@ -109,8 +107,10 @@ public class ExoUtil {
         builder.setSubtitleConfigurations(getSubtitleConfigs(subs));
         if (drm != null) builder.setDrmConfiguration(drm.get());
         if (mimeType != null) builder.setMimeType(mimeType);
+        builder.setAdblock(Setting.isAdblock());
         builder.setMediaId(uri.toString());
         builder.setImageDurationMs(15000);
+        builder.setDecode(decode);
         return builder.build();
     }
 

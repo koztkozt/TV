@@ -308,13 +308,8 @@ public class LiveParser {
         private void convert() {
             try {
                 ClearKey.objectFrom(key);
-                // If parsing succeeds, keep the original JSON key for DRM processing
             } catch (Exception e) {
-                // Only convert if it's not a valid JSON ClearKey format
-                if (!key.contains("\"keys\"") || !key.contains("\"kty\"")) {
-                    key = ClearKey.get(key.replace("\"", "").replace("{", "").replace("}", "")).toString();
-                }
-                // Otherwise, keep the original JSON key for DRM processing
+                key = ClearKey.get(key.replace("\"", "").replace("{", "").replace("}", "")).toString();
             }
         }
 
