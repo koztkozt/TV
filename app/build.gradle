@@ -108,9 +108,6 @@ dependencies {
     implementation 'androidx.media3:media3-exoplayer-smoothstreaming:' + media3Version
     implementation 'androidx.media3:media3-extractor:' + media3Version
     implementation 'androidx.media3:media3-ui:' + media3Version
-    implementation 'androidx.media3:media3-decoder-av1:' + media3Version
-    implementation 'androidx.media3:media3-decoder-iamf:' + media3Version
-    implementation 'androidx.media3:media3-decoder-mpegh:' + media3Version
     implementation 'androidx.room:room-runtime:2.8.2'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.airbnb.android:lottie:6.6.10'
