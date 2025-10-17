@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import androidx.media3.exoplayer.DefaultRenderersFactory;
 import io.github.anilbeesetti.nextlib.media3ext.ffdecoder.NextRenderersFactory;
 
 public class ExoUtil {
@@ -58,7 +59,11 @@ public class ExoUtil {
     }
 
     public static RenderersFactory buildRenderersFactory(int renderMode) {
-        return new NextRenderersFactory(App.get()).setEnableDecoderFallback(true).setExtensionRendererMode(renderMode);
+        // Use native AndroidX Media3 renderers for proper DRM support
+        // FFmpeg-based NextRenderersFactory doesn't handle DRM properly
+        return new DefaultRenderersFactory(App.get())
+                .setEnableDecoderFallback(true)
+                .setExtensionRendererMode(renderMode);
     }
 
     public static MediaSource.Factory buildMediaSourceFactory() {
