@@ -66,18 +66,9 @@ public class Drm {
         builder.setLicenseRequestHeaders(Json.toMap(getHeader()));
         builder.setForceDefaultLicenseUri(isForceKey());
         
-        // For ClearKey DRM, use data URI format for inline license keys
-        if (C.CLEARKEY_UUID.equals(getUUID()) && !getKey().startsWith("http")) {
-            // Check if it's already a data URI
-            if (getKey().startsWith("data:")) {
-                builder.setLicenseUri(getKey());
-            } else {
-                // Convert JSON to data URI
-                builder.setLicenseUri("data:application/json;base64," + android.util.Base64.encodeToString(getKey().getBytes(), android.util.Base64.NO_WRAP));
-            }
-        } else {
-            builder.setLicenseUri(getKey());
-        }
+        // For ClearKey DRM, use the original JSON key directly
+        // AndroidX Media3 should handle ClearKey JSON keys properly
+        builder.setLicenseUri(getKey());
         
         return builder.build();
     }
