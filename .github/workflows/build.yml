@@ -40,7 +40,7 @@ jobs:
       - name: Prepare App
         run: |
           mkdir -p ${{ github.workspace }}/apk/
-          find . -name "release/*.apk" -exec mv {} ${{ github.workspace }}/apk/ \;
+          find . -type f -path "*/release/*.apk" -exec mv {} ${{ github.workspace }}/apk/ \;
 
       - name: Upload App To Artifact
         uses: actions/upload-artifact@v4
