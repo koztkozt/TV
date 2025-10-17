@@ -51,6 +51,12 @@ public class Drm {
         if (getType().contains("playready")) return C.PLAYREADY_UUID;
         if (getType().contains("widevine")) return C.WIDEVINE_UUID;
         if (getType().contains("clearkey")) return C.CLEARKEY_UUID;
+        
+        // Auto-detect ClearKey if license key is JSON format
+        if (!getKey().startsWith("http") && getKey().contains("\"keys\"") && getKey().contains("\"kty\"")) {
+            return C.CLEARKEY_UUID;
+        }
+        
         return C.UUID_NIL;
     }
 
@@ -59,7 +65,20 @@ public class Drm {
         builder.setMultiSession(!C.CLEARKEY_UUID.equals(getUUID()));
         builder.setLicenseRequestHeaders(Json.toMap(getHeader()));
         builder.setForceDefaultLicenseUri(isForceKey());
-        builder.setLicenseUri(getKey());
+        
+        // For ClearKey DRM, use data URI format for inline license keys
+        if (C.CLEARKEY_UUID.equals(getUUID()) && !getKey().startsWith("http")) {
+            // Check if it's already a data URI
+            if (getKey().startsWith("data:")) {
+                builder.setLicenseUri(getKey());
+            } else {
+                // Convert JSON to data URI
+                builder.setLicenseUri("data:application/json;base64," + android.util.Base64.encodeToString(getKey().getBytes(), android.util.Base64.NO_WRAP));
+            }
+        } else {
+            builder.setLicenseUri(getKey());
+        }
+        
         return builder.build();
     }
 }
