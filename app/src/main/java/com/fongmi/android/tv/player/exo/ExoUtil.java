@@ -4,9 +4,11 @@ import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.accessibility.CaptioningManager;
 
+import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
@@ -28,13 +30,14 @@ import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Sub;
+import com.fongmi.android.tv.utils.ResUtil;
+
+import io.github.anilbeesetti.nextlib.media3ext.ffdecoder.NextRenderersFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import io.github.anilbeesetti.nextlib.media3ext.ffdecoder.NextRenderersFactory;
 
 public class ExoUtil {
 
@@ -103,7 +106,15 @@ public class ExoUtil {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(uri);
         builder.setRequestMetadata(getRequestMetadata(headers, uri));
         builder.setSubtitleConfigurations(getSubtitleConfigs(subs));
-        if (drm != null) builder.setDrmConfiguration(drm.get());
+        
+        if (drm != null) {
+            if (C.CLEARKEY_UUID.equals(drm.getUUID()) && !drm.getKey().startsWith("http")) {
+                // For local ClearKey, don't set DrmConfiguration here - handle in Players.java with LocalMediaDrmCallback
+            } else {
+                builder.setDrmConfiguration(drm.get());
+            }
+        }
+        
         if (mimeType != null) builder.setMimeType(mimeType);
         builder.setMediaId(uri.toString());
         builder.setImageDurationMs(15000);
