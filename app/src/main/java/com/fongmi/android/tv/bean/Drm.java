@@ -4,7 +4,6 @@ import android.text.TextUtils;
 
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
-import androidx.media3.common.util.Util;
 
 import com.github.catvod.utils.Json;
 import com.google.gson.JsonElement;
@@ -32,7 +31,7 @@ public class Drm {
         this.type = type;
     }
 
-    public String getKey() {
+    private String getKey() {
         return TextUtils.isEmpty(key) ? "" : key;
     }
 
@@ -55,34 +54,25 @@ public class Drm {
         return C.UUID_NIL;
     }
 
-    // New method: Build JSON from kid:key if needed (centralized here to avoid duplication)
-    public String getClearKeyJson() {
-        String keyStr = getKey().trim();
-        if (keyStr.startsWith("{")) {
-            return keyStr; // Already JSON
-        } else if (keyStr.contains(":")) { // kid:key format - convert to JSON
-            String[] parts = keyStr.split(":");
-            if (parts.length == 2) {
-                byte[] kidBytes = Util.fromHex(parts[0]);
-                byte[] keyBytes = Util.fromHex(parts[1]);
-                String kidBase64 = Util.base64UrlEncode(kidBytes);
-                String keyBase64 = Util.base64UrlEncode(keyBytes);
-                return "{\"keys\":[{\"kty\":\"oct\",\"kid\":\"" + kidBase64 + "\",\"k\":\"" + keyBase64 + "\"}],\"type\":\"temporary\"}";
-            }
-        }
-        return ""; // Invalid - fallback
-    }
-
     public MediaItem.DrmConfiguration get() {
         MediaItem.DrmConfiguration.Builder builder = new MediaItem.DrmConfiguration.Builder(getUUID());
         builder.setMultiSession(!C.CLEARKEY_UUID.equals(getUUID()));
         builder.setLicenseRequestHeaders(Json.toMap(getHeader()));
         builder.setForceDefaultLicenseUri(isForceKey());
 
-        String keyStr = getKey().trim();
-        if (!C.CLEARKEY_UUID.equals(getUUID()) || keyStr.startsWith("http")) { // Remote URL only
-            builder.setLicenseUri(keyStr);
-        } // Local ClearKey (JSON or kid:key) - skip URI; handle with LocalMediaDrmCallback later
+        String keyData = getKey();
+        // Check if the key data is a real URL or local keys (e.g., a JSON string)
+        boolean isLocalKeys = !keyData.startsWith("http");
+
+        if (isLocalKeys && C.CLEARKEY_UUID.equals(getUUID())) {
+            // ✅ For local ClearKey JSON, encode it as a Base64 data URI.
+            // This tells the player to use the data directly, not to make a network request.
+            String base64KeyData = Base64.encodeToString(keyData.getBytes(), Base64.NO_WRAP);
+            builder.setLicenseUri(Uri.parse("data:application/json;base64," + base64KeyData));
+        } else {
+            // ➡️ For network URLs (Widevine, PlayReady, etc.), use the URI as is.
+            builder.setLicenseUri(keyData);
+        }
 
         return builder.build();
     }

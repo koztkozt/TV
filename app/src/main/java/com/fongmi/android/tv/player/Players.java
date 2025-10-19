@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -27,15 +26,11 @@ import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.Tracks;
 import androidx.media3.common.VideoSize;
-import androidx.media3.common.util.Util;
 import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.exoplayer.drm.DefaultDrmSessionManager;
 import androidx.media3.exoplayer.drm.FrameworkMediaDrm;
-import androidx.media3.exoplayer.drm.LocalMediaDrmCallback;
 import androidx.media3.exoplayer.util.EventLogger;
 import androidx.media3.ui.PlayerView;
 
-import com.bumptech.glide.Glide;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
@@ -143,7 +138,6 @@ public class Players implements Player.Listener, ParseCallback {
         exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true);
         exoPlayer.addAnalyticsListener(new EventLogger());
         exoPlayer.setHandleAudioBecomingNoisy(true);
-        view.setRender(Setting.getRender());
         exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
         view.setPlayer(exoPlayer);
@@ -498,26 +492,7 @@ public class Players implements Player.Listener, ParseCallback {
     }
 
     private void setMediaItem(Map<String, String> headers, String url, String format, Drm drm, List<Sub> subs, List<Danmaku> danmakus, long timeout) {
-        if (exoPlayer != null) {
-            MediaItem mediaItem = ExoUtil.getMediaItem(this.headers = checkUa(headers), UrlUtil.uri(this.url = url), this.format = format, this.drm = drm, checkSub(this.subs = subs), decode);
-            
-            if (drm != null && C.CLEARKEY_UUID.equals(drm.getUUID()) && !drm.getKey().startsWith("http")) { // Local ClearKey
-                String json = drm.getClearKeyJson(); // Centralized call to get JSON (handles kid:key or direct JSON)
-                if (!json.isEmpty()) { // Valid JSON
-                    DefaultDrmSessionManager drmManager = new DefaultDrmSessionManager.Builder()
-                        .setUuidAndExoMediaDrmProvider(C.CLEARKEY_UUID, FrameworkMediaDrm.DEFAULT_PROVIDER)
-                        .setMultiSession(true)
-                        .build(new LocalMediaDrmCallback(json.getBytes(Util.UTF_8)));
-                    exoPlayer.getMediaSourceFactory().setDrmSessionManagerProvider((mediaItemLocal) -> drmManager);
-                } else {
-                    // Fallback or error handling if invalid key
-                    ErrorEvent.drm(tag);
-                    return;
-                }
-            }
-            
-            exoPlayer.setMediaItem(mediaItem);
-        }
+        if (exoPlayer != null) exoPlayer.setMediaItem(ExoUtil.getMediaItem(this.headers = checkUa(headers), UrlUtil.uri(this.url = url), this.format = format, this.drm = drm, checkSub(this.subs = subs), decode));
         if (danPlayer != null) setDanmaku(this.danmakus = danmakus);
         App.post(runnable, timeout);
         PlayerEvent.prepare(tag);
@@ -570,6 +545,14 @@ public class Players implements Player.Listener, ParseCallback {
         return scheme.isEmpty() || "file".equals(scheme) ? !Path.exists(url) : host.isEmpty();
     }
 
+    private MediaMetadataCompat.Builder putBitmap(MediaMetadataCompat.Builder builder, Drawable drawable) {
+        try {
+            return builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, ((BitmapDrawable) drawable).getBitmap());
+        } catch (Exception ignored) {
+            return builder;
+        }
+    }
+
     public void setMetadata(String title, String artist, String artUri, Drawable drawable) {
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
         builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
@@ -578,24 +561,8 @@ public class Players implements Player.Listener, ParseCallback {
         builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, artUri);
         builder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, artUri);
         builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, getDuration());
-        App.execute(() -> putBitmap(builder, drawable));
-    }
-
-    private void putBitmap(MediaMetadataCompat.Builder builder, Drawable drawable) {
-        if (drawable == null) {
-            session.setMetadata(builder.build());
-            ActionEvent.update();
-            return;
-        }
-        try {
-            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
-            bitmap = Glide.with(App.get()).asBitmap().load(bitmap).submit(512, 512).get();
-            builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, bitmap);
-            session.setMetadata(builder.build());
-            ActionEvent.update();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        session.setMetadata(putBitmap(builder, drawable).build());
+        ActionEvent.update();
     }
 
     public void share(Activity activity, CharSequence title) {
