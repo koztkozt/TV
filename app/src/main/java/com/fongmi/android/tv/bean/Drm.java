@@ -1,6 +1,8 @@
 package com.fongmi.android.tv.bean;
 
+import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Base64;
 
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
